@@ -85,15 +85,60 @@ public class App implements CommandLineRunner {
     }
 
     private void addItem() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Add Todo");
+        System.out.println("What is the task?");
+        String task = sc.nextLine();
+        System.out.println("Any additional notes?");
+        String note = sc.nextLine();
+        jdbc.update("INSERT INTO todo(todo, note) VALUES(?, ?)", task, note);
+        System.out.println("Add complete");
     }
 
     private void updateItem() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Update Todo");
+        System.out.println("Which item would you like to update?");
+        String itemId = sc.nextLine();
+        ToDo item = jdbc.queryForObject("SELECT * FROM todo WHERE id = ?", new ToDoMapper(), itemId);
+        System.out.println("1. Todo - " + item.getTodo());
+        System.out.println("1. Note - " + item.getNote());
+        System.out.println("1. Finished - " + item.isFinished());
+        System.out.println("What would you like to change?");
+        String choice = sc.nextLine();
+        switch(choice) {
+            case "1":
+                System.out.println("Enter new todo: ");
+                String todo = sc.nextLine();
+                item.setTodo(todo);
+                break;
+            case "2":
+                System.out.println("Enter new note: ");
+                String note = sc.nextLine();
+                item.setNote(note);
+                break;
+            case "3":
+                System.out.println("Toggling finished status to : " + !item.isFinished());
+                item.setFinished(!item.isFinished());
+                break;
+            default:
+                System.out.println("No change made");
+                return;
+        }
+        jdbc.update("UPDATE todo SET todo = ?, note = ?, finished = ? WHERE id = ?",
+                item.getTodo(),
+                item.getTodo(),
+                item.isFinished(),
+                item.getId());
+        System.out.println("Todo updated successfully");
     }
 
+
+
     private void removeItem() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Remove Todo");
+        System.out.println("Which Todo would you like to remove?");
+        String itemId = sc.nextLine();
+        jdbc.update("DELETE FROM todo WHERE id = ?", itemId);
+        System.out.println("Todo removed successfully");
     }
 
 }
